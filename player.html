@@ -1,0 +1,151 @@
+{%- extends "base.html" %}
+
+
+{% import "bootstrap/utils.html" as utils %}
+
+
+{% block content %}
+
+
+<div class="row mt-4">
+  <div class="col col-md-6 offset-md-3 alert alert-primary bg-danger text-white text-center">
+    <span class="h1">Add New Entry</span>
+  </div>
+</div>
+
+
+
+<form method="POST">
+  <div class="row">
+    <div class="col col-md-6 offset-md-3">
+      <div class="row alert alert-warning bg-dark text-white">
+        <span class="col col-md-3 mt-0 h1">Avatar</span>
+        <span class="col col-md-6 mt-0 h1 border-left">Player Name</span>
+        <span class="col col-md-3 mt-0 h1 border-left text-right">Points</span>
+      </div>
+      <div class="row">
+        <input type="hidden" name="id" value={{ score.id }}></input>
+        <select name="avatar" id="avatars" class="col col-md-3 mt-0 h1">
+          {% for a in avatars %}
+          <option value="{{ a }}" 
+          {% if a == score.avatar %}
+          selected
+          {% endif %}
+>{{ avatars\[a] }}</option>
+          {% endfor %}
+        </select>
+        <input type="text" class="col col-md-6 mt-0 h1" name="playername" value={{ score.playername }}></input>
+        <input type="number" class="col col-md-3 mt-0 h1 text-right" name="points" value={{ score.points }}></input>
+      </div>
+    </div>
+  </div>
+  <div class="row mt-0">
+    <div class="col col-md-4 offset-md-5">
+      <input type="submit" class="h1 mt-0 float-right text-center" value="✔️ Confirm"/>
+      <input type="button" class="h1 mt-0 mr-4 button float-right text-center"
+        value="❌ Cancel" onclick="location.href='/'"/>
+    </div>
+  </div>
+</form>
+  
+
+  {%- endblock %}
+We’re applying the same tableless design in the player.html code as we did in the index.html file here, but the main difference is that we’re using a <form> tag and input HTML elements along with a submit button. This form enables users to enter and submit the player data.
+
+We still must provide data for the Jjinja2 template engine to render. So, we create a Python class for each rendered entity. Let’s make the models.py to hold the Score class representing each of the leaderboard lines:
+
+WEB_APP
+
++-- models.py
+
+
+class Score():
+    def __init__(self, id, avatar, playername, points):
+      self.id = id
+      self.avatar = avatar
+      self.playername = playername
+      self.points = points
+Next, let’s implement a backend class to provide data to the views. We still don’t have a database connection, but we can create some fake data to test our web app routes and workflow to see if the data renders as expected.
+
+We create a new leaderboard.py file under the root folder with the following code:
+
+WEB_APP
+
++-- leaderboard.py
+
+
+from models import Score
+
+
+class Leaderboard:
+    def get_scores(self):
+        return self.prepare_scores()
+
+
+    def prepare_scores(self):
+        scores = []
+        scores.append(Score(1, 8, "Marlene F. Martell", 1298))
+        scores.append(Score(2, 1, "Curtis D. Torres", 800))
+        scores.append(Score(3, 7, "Sandy D. Martinez", 765))
+        scores.append(Score(4, 3, "James O. Ewing", 721))
+
+        scores.sort(reverse=True, key=lambda e: e.points)
+
+        result = list(map(lambda score, i: {'id': score.id,
+                                            'ranking': i + 1,
+                                            'avatar': self.get_avatar_dic()\[str(score.avatar)],
+                                            'playername': score.playername,
+                                            'points': score.points
+                                            },
+                        scores,
+                        list(range(len(scores)))))
+
+        return result
+
+    def get_avatar_dic(self):
+        return {
+        "0":"not set",
+        "1":"👨🏻",
+        "2":"👨🏼",
+        "3":"👨🏽",
+        "4":"👨🏾",
+        "5":"👨🏿",
+        "6":"👩🏻",
+        "7":"👩🏼",
+        "8":"👩🏽",
+        "9":"👩🏾",
+        "10":"👩🏿"
+        }
+To consume the data and pass it to the views, let’s modify the app.py file to create an instance of the Leaderboard class and get the scores:
+
+from flask import Flask, render_template, url_for
+from flask_bootstrap import Bootstrap
+from leaderboard import Leaderboard
+from models import Score
+
+
+app = Flask(__name__)
+Bootstrap(app)
+
+
+leaderboard = Leaderboard()
+
+
+@app.route("/")
+def index():
+
+
+
+    scores = leaderboard.get_scores()
+    return render_template("index.html",
+                            scores=scores)
+
+
+
+@app.route("/player", methods=["GET", "POST"])
+def player():
+    avatars = leaderboard.get_avatar_dic()
+    score = Score(0, 0, "", 0)
+
+
+    return render_template("player.html", score = sco
