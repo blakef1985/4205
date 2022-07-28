@@ -28,3 +28,5 @@ INSERT INTO scores (avatar, playername, points)
 
 INSERT INTO scores (avatar, playername, points)
   VALUES (3, 'James O. Ewing', 721);
+
+  cat dbinit.sql | cockroach sql  --url postgresql://blakef:zNU5J3kOq1g3HlSapFm76w@free-tier14.aws-us-east-1.cockroachlabs.cloud:26257/defaultdb?sslmode=verify-full&options=--cluster%3Dprojectdatabase-3887
