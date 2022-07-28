@@ -1,6 +1,6 @@
-WEB_APP
+#WEB_APP
 
-+-- models.py
+#+-- models.py
 
 
 class Score():

@@ -1,6 +1,6 @@
-WEB_APP
+#WEB_APP
 
-+-- leaderboard.py
+#+-- leaderboard.py
 
 
 from models import Score
@@ -22,7 +22,7 @@ class Leaderboard:
 
         result = list(map(lambda score, i: {'id': score.id,
                                             'ranking': i + 1,
-                                            'avatar': self.get_avatar_dic()\[str(score.avatar)],
+                                            'avatar': self.get_avatar_dic()[str(score.avatar)],
                                             'playername': score.playername,
                                             'points': score.points
                                             },
