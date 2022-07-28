@@ -1,6 +1,3 @@
-WEB_APP
-
-+-- dbinit.sql
 SET sql_safe_updates = FALSE;
 
 USE defaultdb;
