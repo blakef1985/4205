@@ -3,26 +3,21 @@
 #+-- leaderboard.py
 
 
-from cockroachdb.sqlalchemy import run_transaction
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from transactions import get_scores_txn, add_score_txn
+from models import Score
+
 
 class Leaderboard:
-    def __init__(self, conn_string):
-        self.engine = create_engine(conn_string, convert_unicode=True)
-        self.sessionmaker = sessionmaker(bind=self.engine)
-
     def get_scores(self):
-        return run_transaction(self.sessionmaker,
-                               lambda session: self.prepare_scores(session))
+        return self.prepare_scores()
 
-    def add_score(self, score):
-        return run_transaction(self.sessionmaker,
-                               lambda session: add_score_txn(session, score.avatar, score.playername, score.points))
 
-    def prepare_scores(self, session):
-        scores = get_scores_txn(session)
+    def prepare_scores(self):
+        scores = []
+        scores.append(Score(1, 8, "Marlene F. Martell", 1298))
+        scores.append(Score(2, 1, "Curtis D. Torres", 800))
+        scores.append(Score(3, 7, "Sandy D. Martinez", 765))
+        scores.append(Score(4, 3, "James O. Ewing", 721))
+
         scores.sort(reverse=True, key=lambda e: e.points)
 
         result = list(map(lambda score, i: {'id': score.id,
@@ -33,6 +28,7 @@ class Leaderboard:
                                             },
                         scores,
                         list(range(len(scores)))))
+
         return result
 
     def get_avatar_dic(self):

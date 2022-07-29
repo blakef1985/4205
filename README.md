@@ -1,9 +1,8 @@
-# 4205
-4205
-this is a leader board app
-WEB_APP
 
-+-- templates
-|-- base.html
-|-- index.html
-  +-- player.html
+pip install flask
+
+pip install flask_bootstrap
+
+pip install sqlalchemy sqlalchemy-cockroachdb psycopg2
+
+flask run
